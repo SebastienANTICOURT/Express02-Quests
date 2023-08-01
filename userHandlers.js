@@ -48,6 +48,15 @@ const database = require("./database");
 // ];
 
 const getUsers = (req, res) => {
+  const sqlUsers = []
+  if (req.query.language != null) {
+    sql += "where language = ?";
+    sqlUsers.push(req.query.language);
+  }
+  if (req.query.city != null) {
+    sql += "where city = ?";
+    sqlUsers.push(req.query.city);
+  }
   database
   .query("select * from users")
   .then(([users]) => {

@@ -28,16 +28,26 @@ const database = require("./database");
 // ];
 
 const getMovies = (req, res) => {
-  console.log('poulet')
+  let sql = "select * from movies";
+  const sqlValues = [];
+  if (req.query.color != null) {
+    sql += " where color = ?";
+    sqlValues.push(req.query.color);
+  }
+  if (req.query.max_duration != null ) {
+    sql += "where duration <= ? ";
+    sqlValues.push(req.query.max_duration);
+  }
   database
-    .query("select * from movies")
-    .then(([movies]) => { //[movies] <=> result[0] qui est la table movie d'après la commande query(...)
+    .query(sql, sqlValues)
+    .then(([movies]) => {
       res.json(movies);
     })
     .catch((err) => {
       console.error(err);
       res.status(500).send("Error retrieving data from database");
     });
+
 };
 
 const getMovieById = (req, res) => {
