@@ -87,14 +87,18 @@ const getUsers = (req, res) => {
   };
 
   const postUser = (req, res) => {
-    const {firstname, lastname, email, city, language} = req.body;
+    const { firstname, lastname, email, city, language, hashedPassword } = req.body;
     console.log(
-      firstname, lastname, email, city, language
+      firstname, lastname, email, city, language, hashedPassword
     )
+    if (!hashedPassword) {
+        return res.status(400).send("Hashed password is missing. Please ensure password hashing was successful.");
+    }
+
     database
       .query(
-        "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
-        [firstname, lastname, email, city, language]
+        "INSERT INTO users(firstname, lastname, email, city, language, password) VALUES (?, ?, ?, ?, ?, ?)",
+        [firstname, lastname, email, city, language, hashedPassword]
       )
       .then(([result]) => {
         res.location(`/api/users/${result.insertId}`).sendStatus(201);
@@ -103,7 +107,7 @@ const getUsers = (req, res) => {
         console.error(err);
         res.status(500).send("Error saving the user");
       });
-  };
+};
 
   const updateUser = (req, res) => {
     const id = parseInt(req.params.id);
